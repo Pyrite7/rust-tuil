@@ -1,7 +1,6 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 
-
 /// A simple, generically implemented 2-dimensional vector struct which can be used for positioning logic.
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
 pub struct Vec2<Elem> {
