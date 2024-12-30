@@ -1,8 +1,8 @@
-use std::{clone, ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign}};
+use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 
 
-
+/// A simple, generically implemented 2-dimensional vector struct which can be used for positioning logic.
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
 pub struct Vec2<Elem> {
     pub x: Elem,
@@ -12,12 +12,81 @@ pub struct Vec2<Elem> {
 impl<Elem> Vec2<Elem> {
     pub fn new(x: Elem, y: Elem) -> Self {
         Self { x, y }
-    }
+    }    
 
     pub fn transmogrifuckify(&self) -> Vec2<&Elem> {
         Vec2::new(&self.x, &self.y)
-    }   
+    }
 }
+
+
+/// Iterates over all Vec2's in the rectangle between this and the origin (default) vector.
+/// Iterates like text is read: primarily increment x from left to right, and when x goes beyond max, increment y and reset x.
+pub struct Vec2Iter<Elem: AddAssign + Default + PartialOrd + Clone + Copy> {
+    max: Vec2<Elem>,
+    current: Vec2<Elem>,
+    step: Vec2<Elem>,
+}
+
+impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Vec2Iter<Elem> {
+    pub fn new(max: &Vec2<Elem>, step: &Vec2<Elem>) -> Self {
+        Self { max: *max, current: Vec2::default(), step: *step }
+    }
+}
+
+impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Iterator for Vec2Iter<Elem> {
+    type Item = Vec2<Elem>;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+        let res = if self.current.y >= self.max.y {
+            None
+        } else {
+            Some(self.current)
+        };
+
+        self.current.x += self.step.x;
+        if self.current.x >= self.max.x {
+            self.current.y += self.step.y;
+            self.current.x = Elem::default();
+        }
+
+        res
+    }
+}
+
+impl<Elem: StepSize + AddAssign + Default + PartialOrd + Clone + Copy> Vec2<Elem> {
+    pub fn rect_iter(&self) -> Vec2Iter<Elem> {
+        Vec2Iter::new(self, &Elem::step())
+    }
+}
+
+
+pub trait StepSize: Sized {
+    /// The Vec2Iter step size for this type, for convenience.
+    fn step() -> Vec2<Self>;
+}
+
+macro_rules! impl_step_size_for_int {
+    ($t:ty) => {
+        impl StepSize for $t {
+            fn step() -> Vec2<Self> {
+                Vec2::new(1,1)
+            }
+        }
+    };
+}
+
+impl_step_size_for_int!(u8);
+impl_step_size_for_int!(u16);
+impl_step_size_for_int!(u32);
+impl_step_size_for_int!(u64);
+impl_step_size_for_int!(u128);
+impl_step_size_for_int!(i8);
+impl_step_size_for_int!(i16);
+impl_step_size_for_int!(i32);
+impl_step_size_for_int!(i64);
+impl_step_size_for_int!(i128);
+
 
 
 
@@ -182,7 +251,7 @@ mod tests {
     fn add_assign_works() {
         let mut v1 = Vec2::new(1, 2);
         let v2 = Vec2::new(3, 4);
-        let mut borrow1 = &mut v1;
+        let borrow1 = &mut v1;
         let borrow2 = &v2;
 
         *borrow1 += v2;
@@ -212,7 +281,7 @@ mod tests {
     fn sub_assign_works() {
         let mut v1 = Vec2::new(10, 17);
         let v2 = Vec2::new(3, 4);
-        let mut borrow1 = &mut v1;
+        let borrow1 = &mut v1;
         let borrow2 = &v2;
 
         *borrow1 -= v2;
@@ -260,6 +329,52 @@ mod tests {
         assert_eq!(v, Vec2::new(18, 45));
         v *= s;
         assert_eq!(v, Vec2::new(54, 135));
+    }
+
+    #[test]
+    fn iterator_works() {
+        let size = Vec2::new(5, 2);
+        let mut iter = Vec2Iter::new(&size, &Vec2::new(1, 1));
+
+        assert_eq!(iter.next(), Some(Vec2::new(0, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(1, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(2, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(3, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(4, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(0, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(1, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(2, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(3, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(4, 1)));
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn rect_iter_works() {
+        let size = Vec2::new(5, 2);
+        let mut iter = size.rect_iter();
+
+        assert_eq!(iter.next(), Some(Vec2::new(0, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(1, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(2, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(3, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(4, 0)));
+        assert_eq!(iter.next(), Some(Vec2::new(0, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(1, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(2, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(3, 1)));
+        assert_eq!(iter.next(), Some(Vec2::new(4, 1)));
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
     }
 }
 
