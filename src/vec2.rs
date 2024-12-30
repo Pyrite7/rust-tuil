@@ -1,4 +1,4 @@
-use std::{clone, ops::{Add, Mul, Neg, Sub}};
+use std::{clone, ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign}};
 
 
 
@@ -16,7 +16,7 @@ impl<Elem> Vec2<Elem> {
 
     pub fn transmogrifuckify(&self) -> Vec2<&Elem> {
         Vec2::new(&self.x, &self.y)
-    }
+    }   
 }
 
 
@@ -116,6 +116,47 @@ impl<Elem: Neg> Neg for Vec2<Elem> {
 }
 
 
+impl<Elem: AddAssign> AddAssign for Vec2<Elem> {
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+impl<Elem: AddAssign + Clone> AddAssign<&Self> for Vec2<Elem> {
+    fn add_assign(&mut self, rhs: &Self) {
+        self.x += rhs.x.clone();
+        self.y += rhs.y.clone();
+    }
+}
+
+
+impl<Elem: SubAssign> SubAssign for Vec2<Elem> {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+    }
+}
+impl<Elem: SubAssign + Clone> SubAssign<&Self> for Vec2<Elem> {
+    fn sub_assign(&mut self, rhs: &Self) {
+        self.x -= rhs.x.clone();
+        self.y -= rhs.y.clone();
+    }
+}
+
+
+impl<Elem: MulAssign<Rhs>, Rhs: Clone> MulAssign<Rhs> for Vec2<Elem> {
+    fn mul_assign(&mut self, rhs: Rhs) {
+        self.x *= rhs.clone();
+        self.y *= rhs.clone();
+    }
+}
+impl<Elem: MulAssign<Rhs>, Rhs: Clone> MulAssign<Rhs> for &mut Vec2<Elem> {
+    fn mul_assign(&mut self, rhs: Rhs) {
+        self.x *= rhs.clone();
+        self.y *= rhs.clone();
+    }
+}
+
 
 
 #[cfg(test)]
@@ -138,6 +179,21 @@ mod tests {
     }
 
     #[test]
+    fn add_assign_works() {
+        let mut v1 = Vec2::new(1, 2);
+        let v2 = Vec2::new(3, 4);
+        let mut borrow1 = &mut v1;
+        let borrow2 = &v2;
+
+        *borrow1 += v2;
+        assert_eq!(v1, Vec2::new(4, 6));
+        v1 += v2;
+        assert_eq!(v1, Vec2::new(7, 10));
+        v1 += borrow2;
+        assert_eq!(v1, Vec2::new(10, 14));
+    }
+
+    #[test]
     fn sub_works() {
         let v1 = Vec2::new(10, 17);
         let v2 = Vec2::new(3, 4);
@@ -150,6 +206,21 @@ mod tests {
         assert_eq!(v1 - borrow2, res);
         assert_eq!(borrow1 - v2, res);
         assert_eq!(borrow1 - borrow2, res);
+    }
+
+    #[test]
+    fn sub_assign_works() {
+        let mut v1 = Vec2::new(10, 17);
+        let v2 = Vec2::new(3, 4);
+        let mut borrow1 = &mut v1;
+        let borrow2 = &v2;
+
+        *borrow1 -= v2;
+        assert_eq!(v1, Vec2::new(7, 13));
+        v1 -= v2;
+        assert_eq!(v1, Vec2::new(4, 9));
+        v1 -= borrow2;
+        assert_eq!(v1, Vec2::new(1, 5));
     }
 
     #[test]
@@ -174,6 +245,21 @@ mod tests {
         assert_eq!(v * borrow_s, res);
         assert_eq!(borrow_v * s, res);
         assert_eq!(borrow_v * borrow_s, res);
+    }
+
+    #[test]
+    fn mul_assign_works() {
+        let mut v = Vec2::new(2, 5);
+        let s = 3;
+        let mut borrow_v = &mut v;
+        let borrow_s = &s;
+
+        borrow_v *= borrow_s;
+        assert_eq!(v, Vec2::new(6, 15));
+        v *= borrow_s;
+        assert_eq!(v, Vec2::new(18, 45));
+        v *= s;
+        assert_eq!(v, Vec2::new(54, 135));
     }
 }
 
