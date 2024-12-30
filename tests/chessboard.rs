@@ -12,11 +12,11 @@ enum ChessTile {
 impl DrawUnit for ChessTile {
     fn draw(&self) -> String {
         match self {
-            Self::Black => "\x1B[48;5;16m\x1B[38;5;15mB",
-            Self::White => "\x1B[48;5;15m\x1B[38;5;16mW",
+            Self::Black => "B",
+            Self::White => "W",
         }.to_string()
-    }   
-}   
+    }
+}
 
 struct ChessBoard;
 
@@ -36,7 +36,12 @@ fn main() {
 
     let draw_instructions = ChessBoard.draw_to_area(&corner);
     
-    println!("{}", draw_instructions);
+    let correct = "BWBWBWB\nWBWBWBW\nBWBWBWB\nWBWBWBW\nBWBWBWB\n".to_string();
+
+    assert_eq!(draw_instructions, correct);
 }
+
+
+
 
 

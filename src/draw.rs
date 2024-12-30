@@ -31,7 +31,7 @@ pub trait Draw<Unit: DrawUnit> {
             .map(|(pos, end_of_row)| {
                 let mut unit = self.draw_at(&pos);
                 if end_of_row {
-                    unit.push_str("\x1B[0m\n"); //TODO: remove this hardcoded ANSI-code \x1B[0m . (it resets style and color options)
+                    unit.push_str("\n");
                 }
                 unit
             })
