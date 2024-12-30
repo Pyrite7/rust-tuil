@@ -32,6 +32,10 @@ impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Vec2Iter<Elem> {
     pub fn new(max: &Vec2<Elem>, step: &Vec2<Elem>) -> Self {
         Self { max: *max, current: Vec2::default(), step: *step }
     }
+
+    pub fn to_row_aware(self) -> RowAwareVec2Iter<Elem> {
+        RowAwareVec2Iter { iterator: self }
+    }
 }
 
 impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Iterator for Vec2Iter<Elem> {
@@ -57,6 +61,10 @@ impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Iterator for Vec2Ite
 impl<Elem: StepSize + AddAssign + Default + PartialOrd + Clone + Copy> Vec2<Elem> {
     pub fn rect_iter(&self) -> Vec2Iter<Elem> {
         Vec2Iter::new(self, &Elem::step())
+    }
+
+    pub fn row_aware_iter(&self) -> RowAwareVec2Iter<Elem> {
+        self.rect_iter().to_row_aware()
     }
 }
 
@@ -86,6 +94,26 @@ impl_step_size_for_int!(i16);
 impl_step_size_for_int!(i32);
 impl_step_size_for_int!(i64);
 impl_step_size_for_int!(i128);
+
+/// A newtype of Vec2Iter which is an iterator over (vec: Vec2, b: bool) where b is whether vec is at the end of the current row.
+pub struct RowAwareVec2Iter<Elem: AddAssign + Default + PartialOrd + Clone + Copy> {
+    iterator: Vec2Iter<Elem>,
+}
+
+impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Iterator for RowAwareVec2Iter<Elem> {
+    /// A tuple containing whatever a corresponding Vec2Iter would return, and a bool representing whether this location is at the end of the current row.
+    type Item = (Vec2<Elem>, bool);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iterator.next()
+            .map(|vec| {
+                let next_next = self.iterator.current;
+                let is_end_of_row = vec.y != next_next.y;
+                (vec, is_end_of_row)
+            })
+    }
+}
+
 
 
 
@@ -369,6 +397,29 @@ mod tests {
         assert_eq!(iter.next(), Some(Vec2::new(2, 1)));
         assert_eq!(iter.next(), Some(Vec2::new(3, 1)));
         assert_eq!(iter.next(), Some(Vec2::new(4, 1)));
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn row_aware_iter_works() {
+        let size = Vec2::new(5, 2);
+        let mut iter = size.row_aware_iter();
+
+        assert_eq!(iter.next(), Some((Vec2::new(0, 0), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(1, 0), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(2, 0), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(3, 0), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(4, 0), true)));
+        assert_eq!(iter.next(), Some((Vec2::new(0, 1), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(1, 1), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(2, 1), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(3, 1), false)));
+        assert_eq!(iter.next(), Some((Vec2::new(4, 1), true)));
         assert_eq!(iter.next(), None);
         assert_eq!(iter.next(), None);
         assert_eq!(iter.next(), None);
