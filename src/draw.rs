@@ -1,24 +1,15 @@
-use std::marker::PhantomData;
-
-use crate::vec2::*;
+use crate::*;
 
 
-/// A type alias for the screen position to be used in this library for now.
-pub type ScrPos = Vec2<u8>;
 
-
-// Think of this like Draw but bundled with size information
-pub struct DrawRect<Unit: DrawUnit, Cnt: Draw<Unit>> {
-    pub size: ScrPos,
-    pub content: Cnt,
-    _unit: PhantomData<Unit>,
-}
 
 
 // The thing that defines and decides what to draw to a given location.
-pub trait Draw<Unit: DrawUnit> {
+pub trait Draw: Sized {
+    type Unit: DrawUnit;
+
     // Required methods
-    fn draw_unit_at(&self, pos: &ScrPos) -> Unit;
+    fn draw_unit_at(&self, pos: &ScrPos) -> Self::Unit;
 
     // Provided methods
     fn draw_at(&self, pos: &ScrPos) -> String {
@@ -37,7 +28,44 @@ pub trait Draw<Unit: DrawUnit> {
             })
             .collect()
     }
+
+    fn in_rect(self, size: ScrPos) -> Rect<Self> {
+        Rect { contents: self, size }
+    }
 }
+
+// A wrapper for any Draw with size information.
+// Can be used to add size information to any Draw type.
+pub struct Rect<Contents: Draw> {
+    pub contents: Contents,
+    pub size: ScrPos,
+}
+
+// A subtrait of Draw which additionally has a size and can be drawn without specifying it.
+pub trait DrawSized: Draw {
+    // Required method
+    fn size(&self) -> ScrPos;
+
+    // Provided methods
+    fn draw(&self) -> String {
+        self.draw_to_area(&self.size())
+    } 
+}
+
+impl<Contents: Draw> Draw for Rect<Contents> {
+    type Unit = Contents::Unit;
+    
+    fn draw_unit_at(&self, pos: &ScrPos) -> Self::Unit {
+        self.contents.draw_unit_at(pos)
+    }
+}
+
+impl<Contents: Draw> DrawSized for Rect<Contents> {
+    fn size(&self) -> ScrPos {
+        self.size
+    }
+}
+
 
 
 // Information how to draw a single character.

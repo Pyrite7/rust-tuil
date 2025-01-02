@@ -15,13 +15,17 @@ impl DrawUnit for ChessTile {
             Self::Black => "\x1B[48;5;16m\x1B[38;5;15mB",
             Self::White => "\x1B[48;5;15m\x1B[38;5;16mW",
         }.to_string()
-    }   
-}   
+    }
+}
+
+
 
 struct ChessBoard;
 
-impl Draw<ChessTile> for ChessBoard {
-    fn draw_unit_at(&self, pos: &draw::ScrPos) -> ChessTile {
+impl Draw for ChessBoard {
+    type Unit = ChessTile;
+
+    fn draw_unit_at(&self, pos: &ScrPos) -> ChessTile {
         if (pos.x + pos.y) % 2 == 0 {
             ChessTile::Black
         } else {

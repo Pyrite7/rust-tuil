@@ -20,8 +20,10 @@ impl DrawUnit for ChessTile {
 
 struct ChessBoard;
 
-impl Draw<ChessTile> for ChessBoard {
-    fn draw_unit_at(&self, pos: &draw::ScrPos) -> ChessTile {
+impl Draw for ChessBoard {
+    type Unit = ChessTile;
+
+    fn draw_unit_at(&self, pos: &ScrPos) -> ChessTile {
         if (pos.x + pos.y) % 2 == 0 {
             ChessTile::Black
         } else {
