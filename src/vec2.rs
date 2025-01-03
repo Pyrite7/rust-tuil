@@ -16,6 +16,10 @@ impl<Elem> Vec2<Elem> {
     pub fn transmogrifuckify(&self) -> Vec2<&Elem> {
         Vec2::new(&self.x, &self.y)
     }
+
+    pub fn into<Elem2: From<Elem>>(self) -> Vec2<Elem2> {
+        Vec2::new(self.x.into(), self.y.into())
+    }
 }
 
 
@@ -252,6 +256,7 @@ impl<Elem: MulAssign<Rhs>, Rhs: Clone> MulAssign<Rhs> for &mut Vec2<Elem> {
         self.y *= rhs.clone();
     }
 }
+
 
 
 
