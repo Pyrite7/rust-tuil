@@ -2,7 +2,6 @@ use std::{io::Write, thread::sleep, time::Duration};
 
 use rust_tuil::*;
 use ansi::*;
-use draw::*;
 
 
 
@@ -68,7 +67,7 @@ fn main() {
     std::io::stdout().flush().unwrap();
 
     loop {
-        sleep(Duration::from_millis(100 ));
+        sleep(Duration::from_millis(16));
         thigny.next_frame();
 
         print!("{}{}", ERASE_SCREEN, RESET_CURSOR);
