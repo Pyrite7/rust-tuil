@@ -1,8 +1,6 @@
 
 pub mod vec2;
 use bounding_rect::BoundingRect;
-use draw_cell::DrawCell;
-use draw_instruction_buffer::DrawInstructionBuffer;
 pub use vec2::*;
 
 pub mod draw_system;
@@ -23,9 +21,5 @@ impl ScrPos {
 }
 
 
-impl DrawCell for char {
-    fn draw_instructions(&self, buf: &mut DrawInstructionBuffer) {
-        buf.push_char(*self);
-    }
-}
+
 

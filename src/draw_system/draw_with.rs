@@ -1,20 +1,20 @@
 
-use crate::{draw_cell::*, ScrPos, bounding_rect::*, draw::*};
+use crate::{ScrPos, bounding_rect::*, draw::*};
+
+use super::styled_char::StyledChar;
 
 
 pub trait DrawWith<T> {
-    type Cell: DrawCell;
 
     // Required methods
-    fn get_cell_with(&self, pos: ScrPos, params: &T) -> Self::Cell;
+    fn get_cell_with(&self, pos: ScrPos, params: &T) -> StyledChar;
 
     fn bounding_rect(&self, params: &T) -> BoundingRect;
 }
 
 impl<T, D: DrawWith<T>> Draw for (D, T) {
-    type Cell = D::Cell;
 
-    fn get_cell(&self, pos: ScrPos) -> Self::Cell {
+    fn get_cell(&self, pos: ScrPos) -> StyledChar {
         self.0.get_cell_with(pos, &self.1)
     }
 

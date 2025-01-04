@@ -1,5 +1,7 @@
 use crate::{style::*, ScrPos, Vec2};
 
+use super::styled_char::StyledChar;
+
 
 
 
@@ -12,6 +14,22 @@ pub struct DrawInstructionBuffer {
 
 
 impl DrawInstructionBuffer {
+    pub fn push_styled_char(&mut self, ch: StyledChar) {
+        if let Some(style) = ch.style {
+            self.set_style(style);
+        }
+
+        if let Some(ch) = ch.char {
+            self.push_char(ch);
+        } else {
+            self.move_cursor_by(Vec2::new(1, 0));
+        }
+    }
+
+    pub fn clear_screen(&mut self) {
+        self.buffer.push_str("\x1B[2J");
+    }
+
     pub fn push_char(&mut self, char: char) {
         self.buffer.push(char);
     }

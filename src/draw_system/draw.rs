@@ -1,6 +1,8 @@
 use crate::ScrPos;
 
-use crate::draw_system::{bounding_rect::*, draw_cell::*};
+use crate::draw_system::{bounding_rect::*};
+
+use super::styled_char::StyledChar;
 
 
 
@@ -13,10 +15,9 @@ use crate::draw_system::{bounding_rect::*, draw_cell::*};
 
 
 pub trait Draw {
-    type Cell: DrawCell;
 
     // Required methods
-    fn get_cell(&self, pos: ScrPos) -> Self::Cell;
+    fn get_cell(&self, pos: ScrPos) -> StyledChar;
 
     fn bounding_rect(&self) -> BoundingRect;
 }

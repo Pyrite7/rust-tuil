@@ -1,4 +1,6 @@
 
+pub mod canvas;
+
 pub mod draw;
 
 pub mod draw_with;
@@ -7,9 +9,9 @@ pub mod draw_instruction_buffer;
 
 pub mod style;
 
-pub mod bounding_rect;
+pub mod styled_char;
 
-pub mod draw_cell;
+pub mod bounding_rect;
 
 
 
