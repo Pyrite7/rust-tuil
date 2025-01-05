@@ -6,7 +6,7 @@ pub use vec2::*;
 pub mod draw_system;
 pub use draw_system::*;
 
-
+pub mod utility;
 
 
 /// A type alias for the screen position to be used in this library for now.

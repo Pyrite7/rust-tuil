@@ -1,10 +1,7 @@
-use std::collections::HashMap;
+use crate::{utility::non_transparent::NonTransparent, ScrPos};
 
-use crate::ScrPos;
+use super::{draw::Draw, draw_instruction_buffer::DrawInstructionBuffer, styled_char::StyledChar};
 
-use super::{bounding_rect::BoundingRect, draw::Draw, draw_instruction_buffer::DrawInstructionBuffer, style::Style, styled_char::{Stylable, StyledChar}};
-
-use crate::vec2::*;
 
 
 
@@ -13,25 +10,22 @@ use crate::vec2::*;
 pub struct Canvas {
     pub size: ScrPos,
     pub contents: Vec<Box<dyn Draw>>,
-    pub background: Box<dyn Draw>,
+    pub background: Box<dyn NonTransparent>,
 }
 
 
 struct DefaultBackground;
 
-impl Draw for DefaultBackground {
-    fn bounding_rect(&self) -> super::bounding_rect::BoundingRect {
-        BoundingRect::new(ScrPos::default(), ScrPos::default())
-    }
+impl NonTransparent for DefaultBackground {
 
-    fn get_cell(&self, pos: ScrPos) -> StyledChar {
+    fn get_cell(&self, _pos: ScrPos) -> StyledChar {
         StyledChar::from(' ')
     }
 }
 
 impl Canvas {
     pub fn new(size: ScrPos) -> Self {
-        let background = Box::new(DefaultBackground) as Box<dyn Draw>;
+        let background = Box::new(DefaultBackground) as Box<dyn NonTransparent>;
         Self { size, contents: Vec::new(), background }
     }
 
@@ -40,11 +34,13 @@ impl Canvas {
         self
     } 
 
-    pub fn select_layer(&self, pos: ScrPos) -> &Box<dyn Draw> {
+    pub fn get_cell(&self, pos: ScrPos) -> StyledChar {
         self.contents
             .iter()
-            .find(|draw| draw.bounding_rect().contains(pos))
-            .unwrap_or(&self.background)
+            .map(|draw| draw.get_cell(pos))
+            .find(|opt| opt.is_some())
+            .unwrap_or_else(|| Some(self.background.get_cell(pos)))
+            .unwrap()
     }
 
     pub fn draw_all(&self) {
@@ -52,8 +48,7 @@ impl Canvas {
 
         self.size.row_aware_iter()
             .for_each(|(pos, end_of_row)| {
-                let draw = self.select_layer(pos);
-                buffer.push_styled_char(draw.get_cell(pos - draw.bounding_rect().top_left_corner));
+                buffer.push_styled_char(self.get_cell(pos));
                 if end_of_row {
                     buffer.push_char('\n');
                 }
@@ -63,4 +58,11 @@ impl Canvas {
     }
 }
 
-
+#[macro_export]
+macro_rules! add_canvas_content {
+    ($canvas:expr, $content:expr) => {
+        $canvas.add_content({
+            boxdyn!($content)
+        })
+    };
+}

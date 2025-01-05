@@ -1,6 +1,5 @@
 use crate::ScrPos;
 
-use crate::draw_system::{bounding_rect::*};
 
 use super::styled_char::StyledChar;
 
@@ -17,12 +16,14 @@ use super::styled_char::StyledChar;
 pub trait Draw {
 
     // Required methods
-    fn get_cell(&self, pos: ScrPos) -> StyledChar;
+    fn get_cell(&self, pos: ScrPos) -> Option<StyledChar>;
 
-    fn bounding_rect(&self) -> BoundingRect;
-
-    
-    // Provided methods
 }
 
+#[macro_export]
+macro_rules! boxdyn {
+    ($draw:expr) => {
+        Box::new($draw) as Box<dyn Draw>
+    };
+}
 

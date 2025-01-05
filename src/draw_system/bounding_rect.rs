@@ -10,8 +10,8 @@ pub struct BoundingRect {
 }
 
 impl BoundingRect {
-    pub fn new(top_left_corner: ScrPos, size: ScrPos) -> Self {
-        Self { top_left_corner, size }
+    pub fn new(left_x: u8, top_y: u8, right_x: u8, bottom_y: u8) -> Self {
+        Self { top_left_corner: ScrPos::new(left_x, top_y), size: ScrPos::new(right_x, bottom_y) }
     }
 
     pub fn contains(&self, point: ScrPos) -> bool {
