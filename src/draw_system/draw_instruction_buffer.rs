@@ -14,10 +14,17 @@ pub struct DrawInstructionBuffer {
 
 
 impl DrawInstructionBuffer {
+
+    pub fn new() -> Self {
+        Self { buffer: String::new(), current_style: Style::default() }
+    }
+
+    pub fn get_instructions(&self) -> &String {
+        &self.buffer
+    }
+
     pub fn push_styled_char(&mut self, ch: StyledChar) {
-        if let Some(style) = ch.style {
-            self.set_style(style);
-        }
+        self.set_style(ch.style);
 
         if let Some(ch) = ch.char {
             self.push_char(ch);

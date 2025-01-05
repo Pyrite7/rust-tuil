@@ -51,6 +51,15 @@ impl Color {
 }
 
 impl Style {
+
+    pub fn from_text_color(color: Color) -> Self {
+        Self { text_color: Some(color), ..Default::default() }
+    }
+
+    pub fn from_bg_color(color: Color) -> Self {
+        Self { bg_color: Some(color), ..Default::default() }
+    }
+
     pub fn ignore_all() -> Self {
         Style { text_color: None,
                 bg_color: None,

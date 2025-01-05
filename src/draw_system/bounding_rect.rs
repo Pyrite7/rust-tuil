@@ -10,10 +10,14 @@ pub struct BoundingRect {
 }
 
 impl BoundingRect {
+    pub fn new(top_left_corner: ScrPos, size: ScrPos) -> Self {
+        Self { top_left_corner, size }
+    }
+
     pub fn contains(&self, point: ScrPos) -> bool {
-           point.x                          >= self.top_left_corner.x 
-        && point.x + self.top_left_corner.x <  self.size.           x
-        && point.y                          >= self.top_left_corner.y 
-        && point.y + self.top_left_corner.y <  self.size.           y
+           point.x >= self.top_left_corner.x 
+        && point.x < self.size.x + self.top_left_corner.x
+        && point.y >= self.top_left_corner.y 
+        && point.y < self.size.y + self.top_left_corner.y
     }
 }

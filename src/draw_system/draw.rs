@@ -20,8 +20,9 @@ pub trait Draw {
     fn get_cell(&self, pos: ScrPos) -> StyledChar;
 
     fn bounding_rect(&self) -> BoundingRect;
+
+    
+    // Provided methods
 }
-
-
 
 
