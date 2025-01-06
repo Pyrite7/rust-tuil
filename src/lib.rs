@@ -8,6 +8,8 @@ pub use draw_system::*;
 
 pub mod utility;
 
+pub mod redraw_system;
+
 
 /// A type alias for the screen position to be used in this library for now.
 pub type ScrPos = Vec2<u8>;

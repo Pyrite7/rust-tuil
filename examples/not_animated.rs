@@ -1,27 +1,19 @@
 use bounding_rect::BoundingRect;
 use canvas::Canvas;
 use draw::Draw;
-use draw_with::DrawWith;
 use rust_tuil::*;
 use style::{Color, Style};
 use styled_char::{Stylable, StyledChar};
 
 
 
-struct Squares {
-    pub col1: Color,
-    pub col2: Color,
-}
+struct Transparent;
 
-impl Draw for Squares {
+impl Draw for Transparent {
     fn get_cell(&self, pos: ScrPos) -> Option<StyledChar> {
-        let col = if (pos.x + pos.y) % 2 == 0 {
-            self.col1
-        } else {
-            self.col2
-        };
-
-        Some(' '.style(Style::from_bg_color(col)))
+        if (pos.x + pos.y) % 2 == 0 {
+            Some(' '.style(Style::from_bg_color(Color::new(0, 0, 0))))
+        } else { None }
     }
 }
 
@@ -61,9 +53,11 @@ impl Draw for Gradient {
 fn main() {
     let mut canvas = Canvas::new(Vec2::new(50, 20));
 
+    add_canvas_content!(canvas, Transparent);
     add_canvas_content!(canvas, Gradient {  col1: Color::new(200, 0, 0),
                                             col2: Color::new(0, 50, 255), 
                                             rect: BoundingRect::new(0, 0, 50, 20) });
+
 
     canvas.draw_all();
 }
