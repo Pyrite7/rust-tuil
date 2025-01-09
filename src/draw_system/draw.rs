@@ -20,10 +20,5 @@ pub trait Draw {
 
 }
 
-#[macro_export]
-macro_rules! boxdyn {
-    ($draw:expr) => {
-        Box::new($draw) as Box<dyn Draw>
-    };
-}
+
 

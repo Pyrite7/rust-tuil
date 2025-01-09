@@ -53,9 +53,9 @@ impl Draw for Gradient {
 fn main() {
     let mut canvas = Canvas::new(Vec2::new(50, 20));
 
-    add_canvas_content!(canvas, Transparent);
-    add_canvas_content!(canvas, Gradient {  col1: Color::new(200, 0, 0),
-                                            col2: Color::new(0, 50, 255), 
+    add_content_directly!(canvas, Transparent);
+    add_content_directly!(canvas, Gradient {  col1: Color::new(200, 0, 0),
+                                            col2: Color::new(0, 50, 255),
                                             rect: BoundingRect::new(0, 0, 50, 20) });
 
 
