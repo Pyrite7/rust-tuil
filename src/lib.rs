@@ -1,7 +1,5 @@
 
-pub mod vec2;
 use bounding_rect::BoundingRect;
-pub use vec2::*;
 
 pub mod draw_system;
 pub use draw_system::*;
@@ -9,6 +7,9 @@ pub use draw_system::*;
 pub mod utility;
 
 pub mod redraw_system;
+
+pub mod geometry;
+pub use geometry::vec2::*;
 
 
 /// A type alias for the screen position to be used in this library for now.

@@ -1,4 +1,4 @@
-use crate::{ScrPos, Vec2Iter};
+use crate::{ScrPos, geometry::iterators::Vec2Iter};
 
 use super::redraw_buffer::RedrawBuffer;
 
