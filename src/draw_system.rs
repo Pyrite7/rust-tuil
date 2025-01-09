@@ -11,8 +11,5 @@ pub mod style;
 
 pub mod styled_char;
 
-pub mod bounding_rect;
 
 
-
-// pub type RedrawBuffer = HashSet<ScrPos>;

@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{ScrPos, Vec2};
+use crate::ScrPos;
 
 
 
@@ -18,7 +18,7 @@ impl RedrawBuffer {
         self.redraw_positions.clear();
     }
 
-    pub fn add_redraw_positions(&mut self, mut positions: Vec<ScrPos>) {
+    pub fn add_redraw_positions(&mut self, positions: Vec<ScrPos>) {
         positions
             .into_iter()
             .for_each(|pos| { self.redraw_positions.insert(pos); });

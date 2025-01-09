@@ -1,4 +1,3 @@
-use bounding_rect::BoundingRect;
 use canvas::Canvas;
 use draw::Draw;
 use rust_tuil::*;
@@ -21,7 +20,7 @@ impl Draw for Transparent {
 struct Gradient {
     pub col1: Color,
     pub col2: Color,
-    pub rect: BoundingRect,
+    pub rect: ScrRect,
 }
 
 impl Draw for Gradient {
@@ -56,7 +55,7 @@ fn main() {
     add_content_directly!(canvas, Transparent);
     add_content_directly!(canvas, Gradient {  col1: Color::new(200, 0, 0),
                                             col2: Color::new(0, 50, 255),
-                                            rect: BoundingRect::new(0, 0, 50, 20) });
+                                            rect: ScrRect::new(0, 0, 50, 20) });
 
 
     canvas.draw_all();
