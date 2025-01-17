@@ -24,3 +24,9 @@ impl ScrPos {
 pub type ScrRect = Rect<u8>;
 
 
+// #[macro_export]
+// macro_rules! hide_cursor {
+//     () => {
+        
+//     };
+// }

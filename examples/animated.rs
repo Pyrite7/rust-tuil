@@ -22,7 +22,7 @@ impl Draw for Lines {
     fn get_cell(&self, pos: ScrPos) -> Option<rust_tuil::styled_char::StyledChar> {
         if pos.x == self.cross_pos.x || pos.y == self.cross_pos.y {
             let col = Color::new(pos.x * 2, pos.y * 8, 125);
-            Some('#'.style(Style::from_text_color(col)))
+            Some('#'.style(Style { text_color: Some(col), invisible: Some(false), ..Default::default() }))
         } else {
             None
         }

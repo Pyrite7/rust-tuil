@@ -23,6 +23,14 @@ impl DrawInstructionBuffer {
         &self.buffer
     }
 
+    pub fn hide_cursor(&mut self) {
+        self.buffer.push_str("\x1B[?25l");
+    }
+
+    pub fn show_cursor(&mut self) {
+        self.buffer.push_str("\x1B[?25h");
+    }
+
     pub fn push_styled_char(&mut self, ch: StyledChar) {
         self.set_style(ch.style);
 

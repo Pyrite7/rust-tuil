@@ -73,6 +73,8 @@ impl Canvas {
 
     pub fn flush_redraw_buffer(&mut self) {
         let mut instruction_buffer = DrawInstructionBuffer::new();
+
+        //instruction_buffer.hide_cursor();
         
         self.redraw_buffer
             .iter()
@@ -83,9 +85,9 @@ impl Canvas {
         
         self.redraw_buffer.reset();
         
+        //instruction_buffer.show_cursor();
+
         print!("{}", instruction_buffer.get_instructions());
-        
-        
     }
 }
 
