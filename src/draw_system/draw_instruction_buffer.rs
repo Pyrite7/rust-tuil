@@ -23,7 +23,9 @@ pub enum Mock {
 impl DrawInstructionBuffer {
 
     pub fn new() -> Self {
-        Self { buffer: String::new(), current_style: Style::default(), current_pos: ScrPos::default(), mocks: Vec::new() }
+        let mut res = Self { buffer: String::new(), current_style: Style::default(), current_pos: ScrPos::default(), mocks: Vec::new() };
+        res.reset_cursor_position();
+        res
     }
 
     pub fn get_instructions(&self) -> &String {
@@ -54,6 +56,7 @@ impl DrawInstructionBuffer {
 
     pub fn push_char(&mut self, char: char) {
         self.buffer.push(char);
+        self.current_pos += ScrPos::new(1, 0);
     }
 
     pub fn reset_style(&mut self) {
@@ -70,35 +73,17 @@ impl DrawInstructionBuffer {
 
     pub fn reset_cursor_position(&mut self) {
         self.buffer.push_str("\x1B[H");
+        self.current_pos = ScrPos::new(0, 0);
     }
 
-    pub fn move_cursor_by(&mut self, by: Vec2<i16>) {
-        if by != Vec2::new(0, 0) {
-            let string = {
-                let x_abs = by.x.abs();
-                let y_abs = by.y.abs();
-                
-                let x_part = match by.x.signum() {
-                    -1 => format!("\x1B[{}D", x_abs),
-                    1 => format!("\x1B[{}C", x_abs),
-                    _ => "".to_string(),
-                };
-    
-                let y_part = match by.y.signum() {
-                    -1 => format!("\x1B[{}A", y_abs),
-                    1 => format!("\x1B[{}B", y_abs),
-                    _ => "".to_string(),
-                };
-    
-                x_part + y_part.as_str()
-            };
-    
-            self.buffer.push_str(&string);
-        }
+    /// NOTE: for now, this method cannot move the cursor up or left because I don't want to implement that because stupid technical reasons
+    pub fn move_cursor_by(&mut self, by: ScrPos) {
+        self.move_cursor_to(self.current_pos + by);
     }
 
     pub fn move_cursor_to(&mut self, to: ScrPos) {
         if self.current_pos != to {
+            self.current_pos = to;
             // As I found out after hours of debugging, apparently the terminal coordinates do not begin at (0,0) but (1,1) instead
             // This caused some very strange behavior :|
             let to_screen = to + ScrPos::new(1, 1);
