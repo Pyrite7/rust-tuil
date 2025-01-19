@@ -10,8 +10,9 @@ struct Transparent;
 
 impl Draw for Transparent {
     fn get_cell(&self, pos: ScrPos) -> Option<StyledChar> {
+        let black = Some(' '.style(Style::from_bg_color(Color::new(0, 0, 0))));
         if (pos.x + pos.y) % 2 == 0 {
-            Some(' '.style(Style::from_bg_color(Color::new(0, 0, 0))))
+            black
         } else { None }
     }
 }

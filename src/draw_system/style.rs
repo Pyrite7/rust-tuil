@@ -170,7 +170,11 @@ impl Into<String> for Style {
             );
         }
 
-        format!("\x1B[{}m", args.join(";"))
+        if args.is_empty() {
+            "".to_string()
+        } else {
+            format!("\x1B[{}m", args.join(";"))
+        }
     }
 }
 

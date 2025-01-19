@@ -46,7 +46,8 @@ impl Canvas {
             .unwrap()
     }
 
-    // TODO: how should this work with the redraw buffer?
+    // Q: how should this work with the redraw buffer?
+    // A: it shouldn't be used while writing to redraw buffer
     pub fn reset(&self) {
         let mut buf = DrawInstructionBuffer::new();
         buf.clear_screen();
@@ -55,26 +56,20 @@ impl Canvas {
         print!("{}", buf.get_instructions());
     }
 
-    pub fn draw_all(&self) {
+    pub fn draw_all(&mut self) {
         self.reset();
 
-        let mut buffer = DrawInstructionBuffer::new();
+        self.redraw_buffer.add_redraw_positions({
+            self.size
+            .rect_iter()
+            .collect()
+        });
 
-        self.size.row_aware_iter()
-            .for_each(|(pos, end_of_row)| {
-                buffer.push_styled_char(self.get_cell(pos));
-                if end_of_row {
-                    buffer.push_char('\n');
-                }
-            });
-        
-        print!("{}", buffer.get_instructions());
+        self.flush_redraw_buffer();
     }
 
     pub fn flush_redraw_buffer(&mut self) {
         let mut instruction_buffer = DrawInstructionBuffer::new();
-
-        //instruction_buffer.hide_cursor();
         
         self.redraw_buffer
             .iter()
@@ -85,9 +80,19 @@ impl Canvas {
         
         self.redraw_buffer.reset();
         
-        //instruction_buffer.show_cursor();
-
         print!("{}", instruction_buffer.get_instructions());
+
+        //FOR DEBUGGING
+        // let paska: String = {
+        //     instruction_buffer.get_instructions()
+        //         .chars()
+        //         .flat_map(|c| vec![c, '.'])
+        //         .collect()
+        // };
+        // println!("{}", paska);
+        // let perse = &instruction_buffer.mocks;
+        // println!("{:?}", perse);
+        // println!("{}", instruction_buffer.get_instructions().chars().count());
     }
 }
 

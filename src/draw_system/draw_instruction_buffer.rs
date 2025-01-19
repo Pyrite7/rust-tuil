@@ -10,13 +10,19 @@ use super::styled_char::StyledChar;
 pub struct DrawInstructionBuffer {
     buffer: String,
     current_style: Style,
+    pub mocks: Vec<Mock>,
+}
+
+#[derive(Debug)]
+pub enum Mock {
+    MoveTo(ScrPos),
 }
 
 
 impl DrawInstructionBuffer {
 
     pub fn new() -> Self {
-        Self { buffer: String::new(), current_style: Style::default() }
+        Self { buffer: String::new(), current_style: Style::default(), mocks: Vec::new() }
     }
 
     pub fn get_instructions(&self) -> &String {
@@ -89,7 +95,11 @@ impl DrawInstructionBuffer {
     }
 
     pub fn move_cursor_to(&mut self, to: ScrPos) {
+        // As I found out after hours of debugging, apparently the terminal coordinates do not begin at (0,0) but (1,1) instead
+        // This caused some very strange behavior :|
+        let to = to + ScrPos::new(1, 1);
         self.buffer.push_str(format!("\x1B[{line};{column}H", line=to.y, column=to.x).as_str());
+        self.mocks.push(Mock::MoveTo(to));
     }
 }
 
