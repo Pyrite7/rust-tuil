@@ -72,10 +72,10 @@ impl Canvas {
         let mut instruction_buffer = DrawInstructionBuffer::new();
         
         self.redraw_buffer
-            .iter()
+            .iter(self.size)
             .for_each(|pos| {
-                instruction_buffer.move_cursor_to(*pos);
-                instruction_buffer.push_styled_char(self.get_cell(*pos));
+                instruction_buffer.move_cursor_to(pos);
+                instruction_buffer.push_styled_char(self.get_cell(pos));
             });
         
         self.redraw_buffer.reset();

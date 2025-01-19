@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
-use crate::ScrPos;
+use crate::{geometry::iterators::Vec2Iter, ScrPos};
+
 
 
 
@@ -24,10 +25,25 @@ impl RedrawBuffer {
             .for_each(|pos| { self.redraw_positions.insert(pos); });
     }
 
-    pub fn iter(&self) -> std::collections::hash_set::Iter<'_, ScrPos> {
-        self.redraw_positions.iter()
+    pub fn iter(&self, size: ScrPos) -> RedrawPosIter {
+        RedrawPosIter { redraw_buffer: self, iter: size.rect_iter() }
     }
 }
 
+
+
+
+pub struct RedrawPosIter<'a> {
+    redraw_buffer: &'a RedrawBuffer,
+    iter: Vec2Iter<u8>,
+}
+
+impl<'a> Iterator for RedrawPosIter<'a> {
+    type Item = ScrPos;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.find(|elem| self.redraw_buffer.redraw_positions.contains(elem))
+    }
+}
 
 
