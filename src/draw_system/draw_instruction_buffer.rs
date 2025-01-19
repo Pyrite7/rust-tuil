@@ -1,4 +1,4 @@
-use crate::{style::*, ScrPos, Vec2};
+use crate::{style::*, Converted, ScrPos, ScrVec, Vec2};
 
 use super::styled_char::StyledChar;
 
@@ -76,9 +76,10 @@ impl DrawInstructionBuffer {
         self.current_pos = ScrPos::new(0, 0);
     }
 
-    /// NOTE: for now, this method cannot move the cursor up or left because I don't want to implement that because stupid technical reasons
-    pub fn move_cursor_by(&mut self, by: ScrPos) {
-        self.move_cursor_to(self.current_pos + by);
+    pub fn move_cursor_by(&mut self, by: ScrVec) {
+        if let Ok(valid_pos) = (self.current_pos.try_into::<i16>().unwrap() + by).try_into() {
+            self.move_cursor_to(valid_pos);
+        }
     }
 
     pub fn move_cursor_to(&mut self, to: ScrPos) {

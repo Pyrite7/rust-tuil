@@ -16,22 +16,26 @@ impl<Elem> Vec2<Elem> {
     pub fn transmogrifuckify(&self) -> Vec2<&Elem> {
         Vec2::new(&self.x, &self.y)
     }
+
+    pub fn try_into<Elem2: TryFrom<Elem>>(self) -> Result<Vec2<Elem2>, <Elem2 as TryFrom<Elem>>::Error> {
+        Ok(<Self as TryInto<Converted<Vec2<Elem2>>>>::try_into(self)?.0)
+    }
 }
 
 pub struct Converted<T>(pub T);
 
-impl<T> AsRef<T> for Converted<T> {
-    fn as_ref(&self) -> &T {
-        &self.0
-    }
-}
+// impl<T> AsRef<T> for Converted<T> {
+//     fn as_ref(&self) -> &T {
+//         &self.0
+//     }
+// }
 
-impl<T> Deref for Converted<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
+// impl<T> Deref for Converted<T> {
+//     type Target = T;
+//     fn deref(&self) -> &Self::Target {
+//         &self.0
+//     }
+// }
 
 impl<Elem, Elem2: TryFrom<Elem>> TryFrom<Vec2<Elem>> for Converted<Vec2<Elem2>> {
     type Error = <Elem2 as TryFrom<Elem>>::Error;
