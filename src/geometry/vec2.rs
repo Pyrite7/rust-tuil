@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Deref, Mul, MulAssign, Neg, Sub, SubAssign};
 
 
 /// A simple, generically implemented 2-dimensional vector struct which can be used for positioning logic.
@@ -16,9 +16,30 @@ impl<Elem> Vec2<Elem> {
     pub fn transmogrifuckify(&self) -> Vec2<&Elem> {
         Vec2::new(&self.x, &self.y)
     }
+}
 
-    pub fn into<Elem2: From<Elem>>(self) -> Vec2<Elem2> {
-        Vec2::new(self.x.into(), self.y.into())
+pub struct Converted<T>(pub T);
+
+impl<T> AsRef<T> for Converted<T> {
+    fn as_ref(&self) -> &T {
+        &self.0
+    }
+}
+
+impl<T> Deref for Converted<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<Elem, Elem2: TryFrom<Elem>> TryFrom<Vec2<Elem>> for Converted<Vec2<Elem2>> {
+    type Error = <Elem2 as TryFrom<Elem>>::Error;
+
+    fn try_from(value: Vec2<Elem>) -> Result<Self, Self::Error> {
+        let x: Elem2 = value.x.try_into()?;
+        let y: Elem2 = value.y.try_into()?;
+        Ok(Converted(Vec2::new(x, y)))
     }
 }
 
