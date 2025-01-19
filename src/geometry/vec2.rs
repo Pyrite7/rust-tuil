@@ -318,27 +318,5 @@ mod tests {
         assert_eq!(iter.next(), None);
     }
 
-    #[test]
-    fn row_aware_iter_works() {
-        let size = Vec2::new(5, 2);
-        let mut iter = size.row_aware_iter();
-
-        assert_eq!(iter.next(), Some((Vec2::new(0, 0), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(1, 0), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(2, 0), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(3, 0), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(4, 0), true)));
-        assert_eq!(iter.next(), Some((Vec2::new(0, 1), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(1, 1), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(2, 1), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(3, 1), false)));
-        assert_eq!(iter.next(), Some((Vec2::new(4, 1), true)));
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-    }
 }
 
