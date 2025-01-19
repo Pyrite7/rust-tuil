@@ -10,6 +10,7 @@ use super::styled_char::StyledChar;
 pub struct DrawInstructionBuffer {
     buffer: String,
     current_style: Style,
+    current_pos: ScrPos,
     pub mocks: Vec<Mock>,
 }
 
@@ -22,7 +23,7 @@ pub enum Mock {
 impl DrawInstructionBuffer {
 
     pub fn new() -> Self {
-        Self { buffer: String::new(), current_style: Style::default(), mocks: Vec::new() }
+        Self { buffer: String::new(), current_style: Style::default(), current_pos: ScrPos::default(), mocks: Vec::new() }
     }
 
     pub fn get_instructions(&self) -> &String {
@@ -72,34 +73,38 @@ impl DrawInstructionBuffer {
     }
 
     pub fn move_cursor_by(&mut self, by: Vec2<i16>) {
-        let string = {
-            let x_abs = by.x.abs();
-            let y_abs = by.y.abs();
-            
-            let x_part = match by.x.signum() {
-                -1 => format!("\x1B[{}D", x_abs),
-                1 => format!("\x1B[{}C", x_abs),
-                _ => "".to_string(),
+        if by != Vec2::new(0, 0) {
+            let string = {
+                let x_abs = by.x.abs();
+                let y_abs = by.y.abs();
+                
+                let x_part = match by.x.signum() {
+                    -1 => format!("\x1B[{}D", x_abs),
+                    1 => format!("\x1B[{}C", x_abs),
+                    _ => "".to_string(),
+                };
+    
+                let y_part = match by.y.signum() {
+                    -1 => format!("\x1B[{}A", y_abs),
+                    1 => format!("\x1B[{}B", y_abs),
+                    _ => "".to_string(),
+                };
+    
+                x_part + y_part.as_str()
             };
-
-            let y_part = match by.y.signum() {
-                -1 => format!("\x1B[{}A", y_abs),
-                1 => format!("\x1B[{}B", y_abs),
-                _ => "".to_string(),
-            };
-
-            x_part + y_part.as_str()
-        };
-
-        self.buffer.push_str(&string);
+    
+            self.buffer.push_str(&string);
+        }
     }
 
     pub fn move_cursor_to(&mut self, to: ScrPos) {
-        // As I found out after hours of debugging, apparently the terminal coordinates do not begin at (0,0) but (1,1) instead
-        // This caused some very strange behavior :|
-        let to = to + ScrPos::new(1, 1);
-        self.buffer.push_str(format!("\x1B[{line};{column}H", line=to.y, column=to.x).as_str());
-        self.mocks.push(Mock::MoveTo(to));
+        if self.current_pos != to {
+            // As I found out after hours of debugging, apparently the terminal coordinates do not begin at (0,0) but (1,1) instead
+            // This caused some very strange behavior :|
+            let to_screen = to + ScrPos::new(1, 1);
+            self.buffer.push_str(format!("\x1B[{line};{column}H", line=to_screen.y, column=to_screen.x).as_str());
+            self.mocks.push(Mock::MoveTo(to_screen));
+        }
     }
 }
 
