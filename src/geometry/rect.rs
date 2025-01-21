@@ -17,6 +17,12 @@ impl<Elem> Rect<Elem> {
     }
 }
 
+impl<Elem: Add<Output = Elem> + Copy> Rect<Elem> {
+    pub fn top_right_corner(&self) -> Vec2<Elem> {
+        self.top_left_corner + self.size
+    }
+}
+
 impl<Elem: Add<Output = Elem> + Ord + Copy> Rect<Elem> {
     pub fn contains(&self, point: Vec2<Elem>) -> bool {
         point.x >= self.top_left_corner.x 

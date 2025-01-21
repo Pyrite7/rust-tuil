@@ -1,4 +1,4 @@
-use crate::{style::*, Converted, ScrPos, ScrVec, Vec2};
+use crate::{style::*, ScrPos, ScrVec, Vec2};
 
 use super::styled_char::StyledChar;
 

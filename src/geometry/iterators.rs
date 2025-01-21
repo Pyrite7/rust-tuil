@@ -1,34 +1,36 @@
-use std::ops::AddAssign;
+use std::ops::{Add, AddAssign};
 
 use crate::Vec2;
 
+use super::rect::Rect;
 
-/// Iterates over all Vec2's in the rectangle between this and the origin (default) vector.
+
+/// Iterates over all Vec2's in a rectangle.
 /// Iterates like text is read: primarily increment x from left to right, and when x goes beyond max, increment y and reset x.
-pub struct Vec2Iter<Elem: AddAssign + Default + PartialOrd + Clone + Copy> {
-    max: Vec2<Elem>,
+pub struct RectIter<Elem: AddAssign + Default + PartialOrd + Clone + Copy> {
+    rect: Rect<Elem>,
     current: Vec2<Elem>,
     step: Vec2<Elem>,
 }
 
-impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Vec2Iter<Elem> {
-    pub fn new(max: &Vec2<Elem>, step: &Vec2<Elem>) -> Self {
-        Self { max: *max, current: Vec2::default(), step: *step }
+impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> RectIter<Elem> {
+    pub fn new(rect: Rect<Elem>, step: Vec2<Elem>) -> Self {
+        Self { rect, current: rect.top_left_corner, step }
     }
 }
 
-impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Iterator for Vec2Iter<Elem> {
+impl<Elem: Add<Output = Elem> + AddAssign + Default + PartialOrd + Clone + Copy> Iterator for RectIter<Elem> {
     type Item = Vec2<Elem>;
     
     fn next(&mut self) -> Option<Self::Item> {
-        let res = if self.current.y >= self.max.y {
+        let res = if self.current.y >= self.rect.top_right_corner().y {
             None
         } else {
             Some(self.current)
         };
 
         self.current.x += self.step.x;
-        if self.current.x >= self.max.x {
+        if self.current.x >= self.rect.top_right_corner().x {
             self.current.y += self.step.y;
             self.current.x = Elem::default();
         }
@@ -38,8 +40,8 @@ impl<Elem: AddAssign + Default + PartialOrd + Clone + Copy> Iterator for Vec2Ite
 }
 
 impl<Elem: StepSize + AddAssign + Default + PartialOrd + Clone + Copy> Vec2<Elem> {
-    pub fn rect_iter(&self) -> Vec2Iter<Elem> {
-        Vec2Iter::new(self, &Elem::step())
+    pub fn rect_iter(self) -> RectIter<Elem> {
+        RectIter::new(Rect { top_left_corner: Vec2::default(), size: self }, Elem::step())
     }
 }
 

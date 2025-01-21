@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{geometry::iterators::Vec2Iter, ScrPos};
+use crate::{geometry::iterators::RectIter, ScrPos};
 
 
 
@@ -35,7 +35,7 @@ impl RedrawBuffer {
 
 pub struct RedrawPosIter<'a> {
     redraw_buffer: &'a RedrawBuffer,
-    iter: Vec2Iter<u8>,
+    iter: RectIter<u8>,
 }
 
 impl<'a> Iterator for RedrawPosIter<'a> {

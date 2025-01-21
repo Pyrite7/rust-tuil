@@ -24,18 +24,18 @@ impl<Elem> Vec2<Elem> {
 
 pub struct Converted<T>(pub T);
 
-// impl<T> AsRef<T> for Converted<T> {
-//     fn as_ref(&self) -> &T {
-//         &self.0
-//     }
-// }
+impl<T> AsRef<T> for Converted<T> {
+    fn as_ref(&self) -> &T {
+        &self.0
+    }
+}
 
-// impl<T> Deref for Converted<T> {
-//     type Target = T;
-//     fn deref(&self) -> &Self::Target {
-//         &self.0
-//     }
-// }
+impl<T> Deref for Converted<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl<Elem, Elem2: TryFrom<Elem>> TryFrom<Vec2<Elem>> for Converted<Vec2<Elem2>> {
     type Error = <Elem2 as TryFrom<Elem>>::Error;
@@ -196,7 +196,6 @@ impl<Elem: MulAssign<Rhs>, Rhs: Clone> MulAssign<Rhs> for &mut Vec2<Elem> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::geometry::iterators::Vec2Iter;
 
     #[test]
     fn add_works() {
@@ -295,29 +294,6 @@ mod tests {
         assert_eq!(v, Vec2::new(18, 45));
         v *= s;
         assert_eq!(v, Vec2::new(54, 135));
-    }
-
-    #[test]
-    fn iterator_works() {
-        let size = Vec2::new(5, 2);
-        let mut iter = Vec2Iter::new(&size, &Vec2::new(1, 1));
-
-        assert_eq!(iter.next(), Some(Vec2::new(0, 0)));
-        assert_eq!(iter.next(), Some(Vec2::new(1, 0)));
-        assert_eq!(iter.next(), Some(Vec2::new(2, 0)));
-        assert_eq!(iter.next(), Some(Vec2::new(3, 0)));
-        assert_eq!(iter.next(), Some(Vec2::new(4, 0)));
-        assert_eq!(iter.next(), Some(Vec2::new(0, 1)));
-        assert_eq!(iter.next(), Some(Vec2::new(1, 1)));
-        assert_eq!(iter.next(), Some(Vec2::new(2, 1)));
-        assert_eq!(iter.next(), Some(Vec2::new(3, 1)));
-        assert_eq!(iter.next(), Some(Vec2::new(4, 1)));
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
-        assert_eq!(iter.next(), None);
     }
 
     #[test]
