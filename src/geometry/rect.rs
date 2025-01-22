@@ -1,7 +1,7 @@
 
 use std::ops::{Add, AddAssign};
 
-use crate::Vec2;
+use crate::{Converted, Vec2};
 
 use super::iterators::{RectIter, StepSize};
 
@@ -43,3 +43,14 @@ impl<Elem: StepSize + Add<Output = Elem> + AddAssign + Default + PartialOrd + Cl
         RectIter::new(self, Elem::step())
     }
 }
+
+impl<Elem, Elem2: TryFrom<Elem>> TryFrom<Rect<Elem>> for Converted<Rect<Elem2>> {
+    type Error = <Elem2 as TryFrom<Elem>>::Error;
+
+    fn try_from(value: Rect<Elem>) -> Result<Self, Self::Error> {
+        let top_left_corner = value.top_left_corner.try_into()?;
+        let size = value.size.try_into()?;
+        Ok(Converted(Rect {top_left_corner, size}))
+    }
+}
+
