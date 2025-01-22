@@ -1,7 +1,9 @@
 
-use std::ops::Add;
+use std::ops::{Add, AddAssign};
 
 use crate::Vec2;
+
+use super::iterators::{RectIter, StepSize};
 
 
 
@@ -30,4 +32,14 @@ impl<Elem: Add<Output = Elem> + Ord + Copy> Rect<Elem> {
      && point.y >= self.top_left_corner.y 
      && point.y < self.size.y + self.top_left_corner.y
  }
+}
+
+impl<Elem: StepSize + Add<Output = Elem> + AddAssign + Default + PartialOrd + Clone + Copy> IntoIterator for Rect<Elem> {
+    type Item = Vec2<Elem>;
+
+    type IntoIter = RectIter<Elem>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        RectIter::new(self, Elem::step())
+    }
 }
