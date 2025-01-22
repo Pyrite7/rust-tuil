@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{geometry::iterators::RectIter, ScrPos};
+use crate::{geometry::iterators::RectIter, ScrPos, ScrRect};
 
 
 
@@ -23,6 +23,14 @@ impl RedrawBuffer {
         positions
             .into_iter()
             .for_each(|pos| { self.redraw_positions.insert(pos); });
+    }
+    
+    pub fn add_redraw_rect(&mut self, rect: ScrRect) {
+        self.add_redraw_positions(rect.into_iter().collect());
+    }
+
+    pub fn add_filtered_redraw_rect(&mut self, rect: ScrRect, filter: impl Fn(&ScrPos) -> bool) {
+        self.add_redraw_positions(rect.into_iter().filter(filter).collect());
     }
 
     pub fn iter(&self, size: ScrPos) -> RedrawPosIter {
