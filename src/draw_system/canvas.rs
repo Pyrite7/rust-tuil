@@ -81,18 +81,6 @@ impl Canvas {
         self.redraw_buffer.reset();
         
         print!("{}", instruction_buffer.get_instructions());
-
-        //FOR DEBUGGING
-        // let paska: String = {
-        //     instruction_buffer.get_instructions()
-        //         .chars()
-        //         .flat_map(|c| vec![c, '.'])
-        //         .collect()
-        // };
-        // println!("{}", paska);
-        // let perse = &instruction_buffer.mocks;
-        // println!("{:?}", perse);
-        // println!("{}", instruction_buffer.get_instructions().chars().count());
     }
 }
 
