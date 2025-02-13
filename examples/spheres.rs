@@ -1,4 +1,5 @@
 use draw::Draw;
+use geometry::rect::Rect;
 use redraw_system::redraw::Redraw;
 use rust_tuil::*;
 use styled_char::StyledChar;
@@ -23,6 +24,10 @@ impl Circle {
         let radius = (from_center.x.powi(2) + from_center.y.powi(2)).sqrt();
         radius <= self.radius
     }
+
+    fn bounding_rect(&self) -> ScrRect {
+        todo!()
+    }
 }
 
 impl Draw for Circle {
@@ -40,14 +45,17 @@ struct CircleUpdateData {
 
 impl Redraw<CircleUpdateData> for Circle {
     fn update_data_and_redraw_positions(&mut self, update_data: CircleUpdateData) -> Vec<ScrPos> {
-        let old_center = self.center;
-        let old_radius = self.radius;
+        let old = self.clone();
 
         if let Some(new_center) = update_data.new_center {
             self.center = new_center;
         }
         if let Some(new_radius) = update_data.new_radius {
             self.radius = new_radius;
+        }
+
+        fn create_filter(circ: Circle) -> impl Fn(ScrPos) -> bool {
+            move |pos| circ.contains(pos.try_into().unwrap())
         }
 
         todo!()
